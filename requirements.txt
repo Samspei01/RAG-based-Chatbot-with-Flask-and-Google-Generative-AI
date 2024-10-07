@@ -15,4 +15,4 @@ python-dotenv
 asyncio
 langchain_community
 email_validator
-faiss-gpu
+faiss-cpu
