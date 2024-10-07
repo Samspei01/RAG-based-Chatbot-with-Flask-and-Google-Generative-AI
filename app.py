@@ -65,13 +65,25 @@ def home():
 def register():
     form = registrationForm()
     if form.validate_on_submit():
+        existing_user = User.query.filter_by(email=form.email.data).first()
+        if existing_user:
+            flash('Email already exists. Please use a different email.', 'danger')
+            return redirect(url_for('register'))
+        
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode("utf-8")
-        new_user = User(fname=form.fname.data,lname=form.lname.data,username=form.username.data,email=form.email.data,password=hashed_password)
+        new_user = User(
+            fname=form.fname.data,
+            lname=form.lname.data,
+            username=form.username.data,
+            email=form.email.data,
+            password=hashed_password,
+            image_file='default.jpg'
+        )
         db.session.add(new_user)
         db.session.commit()
-        flash('Registration successful!')
+        flash('Registration successful!', 'success')
         return redirect(url_for("login"))
-    return render_template('register.html',title = 'Register', form=form)
+    return render_template('register.html', form=form)
 
 #####################################################################  
 @app.route('/login', methods=['GET', 'POST'])
