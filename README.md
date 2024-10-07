@@ -33,7 +33,7 @@ This project implements a chatbot capable of answering questions based on upload
 
 2. **Set up a virtual environment**:
    ```bash
-   python3 -m venv venv
+   python3.9 -m venv venv
    source venv/bin/activate
    ```
 
