@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styleregister.css') }}">
+</head>
+
+
+<body>
+    <div class="container">
+        <!-- Title section -->
+        <div class="title">Registration</div>
+        <div class="content">
+            <!-- Registration form with Flask and WTForms -->
+            <form method="POST" action="{{ url_for('register') }}">
+                {{ form.hidden_tag() }}
+                <div class="user-details">
+                    <!-- Input for First Name -->
+                    <div class="input-box">
+                        <span class="details">First Name</span>
+                        {{ form.fname(size=32, placeholder="Enter your first name") }}
+                        {% for error in form.fname.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                    </div>
+                    <!-- Input for Last Name -->
+                    <div class="input-box">
+                        <span class="details">Last Name</span>
+                        {{ form.lname(size=32, placeholder="Enter your last name") }}
+                        {% for error in form.lname.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                    </div>
+                    <!-- Input for Username -->
+                    <div class="input-box">
+                        <span class="details">Username</span>
+                        {{ form.username(size=32, placeholder="Enter your username") }}
+                        {% for error in form.username.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                    </div>
+                    <!-- Input for Email -->
+                    <div class="input-box">
+                        <span class="details">Email</span>
+                        {{ form.email(size=32, placeholder="Enter your email") }}
+                        {% for error in form.email.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                    </div>
+                    <!-- Input for Password -->
+                    <div class="input-box">
+                        <span class="details">Password</span>
+                        {{ form.password(size=32, placeholder="Enter your password") }}
+                        {% for error in form.password.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                    </div>
+                    <!-- Input for Confirm Password -->
+                    <div class="input-box">
+                        <span class="details">Confirm Password</span>
+                        {{ form.confirm_password(size=32, placeholder="Confirm your password") }}
+                        {% for error in form.confirm_password.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Gender section (optional) -->
+                <div class="gender-details">
+                    <input type="radio" name="gender" id="dot-1">
+                    <input type="radio" name="gender" id="dot-2">
+                    <input type="radio" name="gender" id="dot-3">
+                    <span class="gender-title">Gender</span>
+                    <div class="category">
+                        <!-- Label for Male -->
+                        <label for="dot-1">
+                            <span class="dot one"></span>
+                            <span class="gender">Male</span>
+                        </label>
+                        <!-- Label for Female -->
+                        <label for="dot-2">
+                            <span class="dot two"></span>
+                            <span class="gender">Female</span>
+                        </label>
+                        <!-- Label for Prefer not to say -->
+                        <label for="dot-3">
+                            <span class="dot three"></span>
+                            <span class="gender">Prefer not to say</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Submit button -->
+                <div class="button">
+                    {{ form.submit(value="Register") }}
+                </div>
+                <div class="login-link">
+                    <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

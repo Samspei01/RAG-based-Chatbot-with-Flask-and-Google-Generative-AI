@@ -1,0 +1,16 @@
+version: '3.9'
+
+services:
+  flask-app:
+    build: .
+    container_name: flask-app
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+      - ./uploads:/app/uploads
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY} 
+    env_file:
+      - .env
+    restart: always
