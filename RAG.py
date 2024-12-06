@@ -10,6 +10,8 @@ from dotenv import load_dotenv
 from langchain.chains.question_answering import load_qa_chain
 from cachetools import LRUCache
 import asyncio
+
+MAX_TOKEN_LIMIT = 2048
 ############################################################################################################
 class RAG:
     def __init__(self):
@@ -19,6 +21,15 @@ class RAG:
         self.vector_store_path = "faiss_index"
         self.cache = LRUCache(maxsize=100) 
         self.embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+
+    def count_tokens(self, text):
+        return len(text.split())
+
+    def enforce_token_limit(self, text):
+        if self.count_tokens(text) > MAX_TOKEN_LIMIT:
+            raise ValueError(
+                f"Input exceeds the maximum token limit of {MAX_TOKEN_LIMIT} tokens."
+            )
 
 ############################################################################################################
     def get_pdf_text(self, pdf_docs):
@@ -74,18 +85,33 @@ class RAG:
             return answer
 ####################################################################################
     async def user_input(self, user_question):
-        new_db = FAISS.load_local(self.vector_store_path, self.embeddings, allow_dangerous_deserialization=True)
-        docs = await asyncio.to_thread(new_db.similarity_search, user_question, k=3)
-        chain = self.get_conversational_chain()
-        response = await asyncio.to_thread(chain, {"input_documents": docs, "question": user_question}, return_only_outputs=True)
-        return response["output_text"]
+        try:
+            self.enforce_token_limit(user_question)
+            new_db = FAISS.load_local(self.vector_store_path, self.embeddings, allow_dangerous_deserialization=True)
+            docs = await asyncio.to_thread(new_db.similarity_search, user_question, k=3)
+            chain = self.get_conversational_chain()
+            response = await asyncio.to_thread(chain, {"input_documents": docs, "question": user_question}, return_only_outputs=True)
+
+            return response["output_text"]
+
+        except ValueError as ve:
+            return f"Validation error: {ve}"
+        except Exception as e:
+            return f"An unexpected error occurred: {e}"
+
 ###################################################################################
     async def main(self, pdf_docs, user_question):
-        text = self.get_pdf_text(pdf_docs)
-        chunks = self.get_text_chunks(text)
-        self.get_vector_store(chunks)
-        answer = await self.cached_user_input(user_question)
-        return answer
+        try:
+            text = self.get_pdf_text(pdf_docs)
+            chunks = self.get_text_chunks(text)
+            self.get_vector_store(chunks)
+            answer = await self.cached_user_input(user_question)
+            return answer
+        except ValueError as ve:
+            return f"Error: {ve}"
+        except Exception as e:
+            return f"An unexpected error occurred during processing: {e}"
+
     #############################################################################
     async def model(self, pdf_docs, user_question):
         #print("pdf_docs: ", pdf_docs)
